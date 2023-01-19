@@ -1,13 +1,10 @@
 import { NextAuthOptions } from "next-auth"
-import GitHubProvider from "next-auth/providers/github"
-import EmailProvider from "next-auth/providers/email"
+import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { Client } from "postmark"
 
 import { db } from "@/lib/db"
 import { siteConfig } from "@/config/site"
 
-const postmarkClient = new Client(process.env.POSTMARK_API_TOKEN)
 
 export const authOptions: NextAuthOptions = {
   // huh any! I know.
@@ -21,47 +18,9 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    }),
-    EmailProvider({
-      from: process.env.SMTP_FROM,
-      sendVerificationRequest: async ({ identifier, url, provider }) => {
-        const user = await db.user.findUnique({
-          where: {
-            email: identifier,
-          },
-          select: {
-            emailVerified: true,
-          },
-        })
-
-        const templateId = user?.emailVerified
-          ? process.env.POSTMARK_SIGN_IN_TEMPLATE
-          : process.env.POSTMARK_ACTIVATION_TEMPLATE
-        const result = await postmarkClient.sendEmailWithTemplate({
-          TemplateId: parseInt(templateId),
-          To: identifier,
-          From: provider.from,
-          TemplateModel: {
-            action_url: url,
-            product_name: siteConfig.name,
-          },
-          Headers: [
-            {
-              // Set this to prevent Gmail from threading emails.
-              // See https://stackoverflow.com/questions/23434110/force-emails-not-to-be-grouped-into-conversations/25435722.
-              Name: "X-Entity-Ref-ID",
-              Value: new Date().getTime() + "",
-            },
-          ],
-        })
-
-        if (result.ErrorCode) {
-          throw new Error(result.Message)
-        }
-      },
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
   callbacks: {
