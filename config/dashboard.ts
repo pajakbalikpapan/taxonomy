@@ -14,23 +14,6 @@ export const dashboardConfig: DashboardConfig = {
   ],
   sidebarNav: [
     {
-      title: "Posts",
-      href: "/dashboard",
-      icon: "post",
-    },
-    {
-      title: "Pages",
-      href: "/",
-      icon: "page",
-      disabled: true,
-    },
-    {
-      title: "Media",
-      href: "/",
-      icon: "media",
-      disabled: true,
-    },
-    {
       title: "Billing",
       href: "/dashboard/billing",
       icon: "billing",

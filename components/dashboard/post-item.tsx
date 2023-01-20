@@ -26,7 +26,6 @@ export function PostItem({ post }: PostItemProps) {
         </div>
       </div>
       <PostOperations post={{ id: post.id, title: post.title }} />
-      {/* <PostDeleteButton post={{ id: post.id, title: post.title }} /> */}
     </div>
   )
 }
